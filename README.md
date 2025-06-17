@@ -2,14 +2,6 @@
 Traditional multipliers prioritize accuracy, often at the expense of power, speed, or area. 
   
 This project implements a low-power, high-speed 4x4-bit approximate multiplier in Verilog HDL by implementing modified Dadda technique, using a combination of approximate compressors, approximate adders, and an exact half-adder. It is suitable for error-resilient applications like image processing or machine learning, where power efficiency and area reduction are more important than perfect accuracy, achieving significant area and power reduction compared to traditional multipliers with minimal minimal absolute error. The design is simulated and synthesized using Xilinx Vivado. 
-
-This design trades off some accuracy for gains in:
-
-  -> Area efficiency
-  
-  -> Reduced power consumption
-  
-  -> Improved delay (speed)
   
 ## Overview
 An nxn multiplication is conventionally composed of three operational phases: partial product generation, carry-free reduction of partial products and carry propagating addition. In this project, the main focus was on approximation in the partial product tree of approximate multiplier, achieved by reduction in partial product tree. Dadda  technique for multiplication process decreases the number of adder stages. In this techniques half adder and full adders are used for summation of the partial products. Due to this hardware complexity is reduced. 
@@ -118,17 +110,52 @@ Product p1 is simply the OR of partial products a0,1 and a1,0. Conventionally, i
 
 For two bit sum, XOR and OR operation yield same results, resulting in accurate prediction of p1. XOR increases delay and hardware complexity, hence replacement with OR operator greatly increases speed and reduces hardware.
 
-However, carry term is neglected in the calculation. However, this yield incorrect result in only 1 out of 16 total combinations of a[0],b[0],a[1],b[1] (this happens only when all four are equal to one, with each being equal to one with probability 1/2). Thus, relatively lesser error happens as effect of forward carry can be ignored in 15 out of 16 cases.
+However, carry term is neglected in the calculation. However, this yield incorrect result in only 1 out of 16 total combinations of a[0],b[0],a[1],b[1] (this happens only when all four are equal to one, with each being equal to one with probability 1/2). Thus, relatively lesser error happens as effect of forward carry can be ignored in 15 out of 16 cases. 
 
 ### Column 2: p2
 
-Here, 
+Here, with the help of approximate compressor designed earlier, the sum (p2) and forward carry (C2) for next column were calculated, with partial products a2,2, a3,1, a1,3 as 3 inputs. The carry from previous column, as discussed above, is treated as 0. Thus, the fourth input becomes 0. This further reduces complexity and improves speed.
+
+This approximation is not valid (forward carry = 0) in further columns due to considerations of accuracy.
 
 ![image](https://github.com/user-attachments/assets/7dea9c17-7c61-43af-a365-6a457d210bc5)
 
 
 ### Column 3: p3
-approx_comp_42 c3 (C3, result[3], C2, (A[3] & B[0]) | (A[0] & B[3]), (A[2] & B[1]) | (A[1] & B[2]), (A[0] & B[3] & A[3] & B[0]) |  (A[1] & B[2] & A[2] & B[1]));
+
+![image](https://github.com/user-attachments/assets/6097cf6f-106a-4c2c-9615-8be4492d6b19)
+
+This column is of significant interest because of highest number of partial products in this column. We have 5 bits to add: four partial products a0,3, a3,0, a1,2, a2,1 and the carry C2 from the previous column. The net approximate sum would yield p3 and C3 as the forward carry to the next column.
+
+Here, the concept of propagate and generate terms comes handy. Apparently, the two partial products am,n and an,m can be replaced by Gm,n and Pm,n, i.e.,
+
+am,n + an,m = Gm,n + Pm,n
+
+![image](https://github.com/user-attachments/assets/67b59d8e-bc5a-481a-a7e6-39773467510f)
+
+This yields error in only 1 out of 4 cases, with total probability of error being (1/2).(1/2).(1/2).(1/2)=1/16.
+
+Thus, we now end up with C2 and
+
+-> P0,3 = A[3] & B[0]) | (A[0] & B[3])
+
+-> P1,2 = (A[2] & B[1]) | (A[1] & B[2])
+
+-> G0,3 = (A[0] & B[3] & A[3] & B[0])
+
+-> G1,2 = A[1] & B[2] & A[2] & B[1])
+
+as inputs.
+
+We further reduce the terms G0,3 and G1,2 to their propagate and generate terms, leaving us with two other terms instead of G0,3 and G1,2:
+
+-> P0,1,2,3 = (A[0] & B[3] & A[3] & B[0]) |  (A[1] & B[2] & A[2] & B[1])
+
+-> G0,1,2,3 = (A[0] & B[3] & A[3] & B[0]) &  (A[1] & B[2] & A[2] & B[1])
+
+Now, probability of G0,1,2,3 being 1 is equal to (1/2).(1/2).(1/2).(1/2).(1/2).(1/2).(1/2).(1/2)=1/256, which means this can be safely approximated to 0 (only one case out of total 256 cases would face error, which is a very reasonable approximation).
+
+Thus, with G0,1,2,3 equated to 0, we end up with inputs P0,3, P1,2, P0,1,2,3 and C2 as inputs to the approximate compressor discussed before.
 
 ### Column 4: p4
 With the help of approximate compressor designed earlier, the sum (p4) and forward carry (C4) for next column were calculated, with partial products a2,2, a3,1, a1,3 and the carry C3 from previous column as inputs.
@@ -160,8 +187,25 @@ Mean Relative Error: 6.24%
 ### Utilisation Report:
 ![image](https://github.com/user-attachments/assets/b721066a-b8aa-40a4-994e-ad0f7fc562a9)
 
+![image](https://github.com/user-attachments/assets/371835b2-7e48-4a26-bcd6-27ac828c802d)
+
 Number of LUTs used: 10 (significantly lower than 16 LUTs used by conventional multiplier.
 
 ### Power Report:
 ![image](https://github.com/user-attachments/assets/3ff4f4d3-71f0-4e25-91c9-abbff397d5b1)
 
+![image](https://github.com/user-attachments/assets/f2f25762-6725-4bfd-85ca-b04e3c39c585)
+
+![image](https://github.com/user-attachments/assets/3acfac6f-3c65-4368-8ca4-4ab0085c53a5)
+
+![image](https://github.com/user-attachments/assets/8dcf3b03-adfb-422a-af43-a1e8ae2e7480)
+
+
+## Conclusion
+This design trades off some accuracy (6.24% error) for gains in:
+
+  -> Area efficiency (LUTs reduced from 16 to 12).
+  
+  -> Reduced power consumption
+  
+  -> Improved delay (speed) 
