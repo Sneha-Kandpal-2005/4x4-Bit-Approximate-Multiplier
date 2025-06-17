@@ -178,7 +178,7 @@ To maintain higher accuracy and keeping in mind the importance of accuracy in MS
 
 
 ## Results
-### Absolute Error Output:
+### Mean Absolute Error:
 
 ![image](https://github.com/user-attachments/assets/05ff45a8-443e-4553-bf02-c416095730d6)
 
@@ -202,7 +202,7 @@ Number of LUTs used: 10 (significantly lower than 16 LUTs used by conventional m
 
 
 ## Conclusion
-This design trades off some accuracy (6.24% error) for gains in:
+This design trades off some accuracy (6.24% mean relative error) for gains in:
 
   -> Area efficiency (LUTs reduced from 16 to 12).
   
