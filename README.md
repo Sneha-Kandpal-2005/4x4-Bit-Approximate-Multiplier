@@ -108,7 +108,7 @@ Product p1 is simply the OR of partial products a0,1 and a1,0. Conventionally, i
 
 ![image](https://github.com/user-attachments/assets/5e82d9b7-058f-4f43-99fd-df1d9db73cce)
 
-For two bit sum, XOR and OR operation yield same results, resulting in accurate prediction of p1. XOR increases delay and hardware complexity, hence replacement with OR operator greatly increases speed and reduces hardware2
+For two bit sum, XOR and OR operation yield same results, resulting in accurate prediction of p1. XOR increases delay and hardware complexity, hence replacement with OR operator greatly increases speed and reduces hardware.
 
 However, carry term is neglected in the calculation. However, this yield incorrect result in only 1 out of 16 total combinations of A[0],B[0],A[1],B[1] (this happens only when all four are equal to one, with each being equal to one with probability 1/2). Thus, relatively lesser error happens as effect of forward carry can be ignored in 15 out of 16 cases. 
 
