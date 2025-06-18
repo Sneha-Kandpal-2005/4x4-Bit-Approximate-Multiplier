@@ -189,7 +189,7 @@ Mean Relative Error: 6.24%
 
 ![image](https://github.com/user-attachments/assets/371835b2-7e48-4a26-bcd6-27ac828c802d)
 
-Number of LUTs used: 10 (significantly lower than 16 LUTs used by conventional multiplier.
+Number of LUTs used: 10 (significantly lower than 16 LUTs used by conventional multiplier).
 
 ### Power Report:
 ![image](https://github.com/user-attachments/assets/3ff4f4d3-71f0-4e25-91c9-abbff397d5b1)
